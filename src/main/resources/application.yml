@@ -1,0 +1,17 @@
+server:
+  port: 9092
+
+spring:
+  application:
+    name: log service
+  datasource:
+    name: test
+    url: jdbc:mysql://localhost:3306/test?useSSL=false&characterEncoding=utf8
+    username: root
+    password: yq199410
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: update

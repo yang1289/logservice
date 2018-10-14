@@ -1,4 +1,4 @@
-package com.mituo.logservice.serivce;
+package com.mituo.logservice.service;
 
 
 import com.alibaba.fastjson.JSON;

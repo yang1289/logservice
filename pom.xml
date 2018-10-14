@@ -97,7 +97,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+                <configuration>
+                    <mainClass>com.mituo.logservice.LogserviceApplication</mainClass>
+                    <fork>true</fork>
+                    <executable>true</executable>
+                </configuration>
+    </plugin>
         </plugins>
     </build>
 

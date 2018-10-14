@@ -1,9 +1,17 @@
-package com.mituo.logservice.dto;
+package com.mituo.logservice.entity;
+
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
+@Document(collection = "api_full_log")
 public class CmptFullLog {
+
+    @Id
     private String idCmptFullLog;
+
     private String idApi;
     private String idApiGroup;
     private String appID;

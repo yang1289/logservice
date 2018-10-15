@@ -1,7 +1,7 @@
 package com.mituo.logservice.job;
 
 
-import com.mituo.logservice.serivce.SaveLogService;
+import com.mituo.logservice.service.SaveLogService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

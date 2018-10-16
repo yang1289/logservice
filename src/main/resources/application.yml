@@ -8,4 +8,4 @@ spring:
       database: logservice
 log:
   rootPath: D:/logs
-  testRootPaht: D:/testLogs
+  testRootPath: D:/testLogs

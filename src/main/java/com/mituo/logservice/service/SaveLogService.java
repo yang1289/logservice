@@ -31,7 +31,7 @@ public class SaveLogService {
     private InterLogDAO interLogDAO;
 
     private static Logger logger= LogManager.getLogger(SaveLogService.class);
-    @Value("${log.testRootPaht}")
+    @Value("${log.testRootPath}")
     private String testRootPath;
 
     @Value("${log.rootPath}")

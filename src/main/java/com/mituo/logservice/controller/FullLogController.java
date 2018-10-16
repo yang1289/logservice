@@ -38,10 +38,7 @@ public class FullLogController {
         Mono<StatusDTO> statusDTO;
         DateFormat dateFormat=new SimpleDateFormat("yyyyMMddHHmmss");
         String requestTime=dateFormat.format(cmptFullLog.getRequestTime());
-        String requester="";
-        if(!"".equals(cmptFullLog.getAppName()) && null!=cmptFullLog.getAppName()){
-            requester=cmptFullLog.getAppName();
-        }
+
         boolean isOk=true;
         if(!"".equals(cmptFullLog.getResponseErrorInfo()) && null!=cmptFullLog.getResponseErrorInfo()){
             isOk=false;
@@ -50,9 +47,11 @@ public class FullLogController {
         String username="";
         String interfaceCondition="";
         String sfzh="";
+        String requester="";
         String usernameRegex="\"*xm\"*\\s*[:|=]\\s*\"*([a-zA-Z0-9_]*)\"*";
         String sfzhRegex="\"*sfzh\"*\\s*[:|=]\\s*\"*([a-zA-Z0-9_]*)\"*";
         String conditionRegex="\"*condition\"*\\s*[:|=]\\s*([a-zA-Z0-9_,./{}:;\\[\\]\"'?]+)";
+        String jgdmRegex="\"*jgdm\"*\\s*[:|=]\\s*\"*([a-zA-Z0-9_]*)\"*";
         Pattern usernamePattern=Pattern.compile(usernameRegex);
         Pattern sfzhPattern=Pattern.compile(sfzhRegex);
         Pattern conditionPattern=Pattern.compile(conditionRegex);
@@ -67,6 +66,7 @@ public class FullLogController {
                 }else{
                     interfaceCondition="接口名称:无 "+" 查询内容:"+stringUtil.getSubString(requestParamsData,conditionRegex,1);
                 }
+                requester="单位:"+stringUtil.getSubString(requestParamsData,jgdmRegex,1);
             }catch(Exception e){
                 logger.error(e.getMessage());
             }
@@ -80,6 +80,7 @@ public class FullLogController {
                 }else{
                     interfaceCondition="接口名称:无 "+" 查询内容:"+stringUtil.getSubString(requestPostParamsData,conditionRegex,1);
                 }
+                requester="单位:"+stringUtil.getSubString(requestPostParamsData,jgdmRegex,1);
             }catch(Exception e){
                 logger.error(e.getMessage());
             }
@@ -93,6 +94,7 @@ public class FullLogController {
                 }else{
                     interfaceCondition="接口名称:无 "+" 查询内容:"+stringUtil.getSubString(requestBodyData,conditionRegex,1);
                 }
+                requester="单位:"+stringUtil.getSubString(requestBodyData,jgdmRegex,1);
             }catch(Exception e){
                 logger.error(e.getMessage());
             }

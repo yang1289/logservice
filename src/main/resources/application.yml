@@ -6,3 +6,6 @@ spring:
       host: localhost
       port: 27017
       database: logservice
+log:
+  rootPath: D:/logs
+  testRootPaht: D:/testLogs

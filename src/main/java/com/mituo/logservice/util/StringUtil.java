@@ -1,11 +1,13 @@
 package com.mituo.logservice.util;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class StringUtil {
-
-
     public String clearBlankWrapTabs(String oldString){
         String newString="";
         if(!"".equals(oldString) && null!=oldString){

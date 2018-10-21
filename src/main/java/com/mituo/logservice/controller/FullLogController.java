@@ -95,7 +95,6 @@ public class FullLogController {
                 JSONObject bodyJsonObject= JSON.parseObject(requestBodyData);
                 JSONObject endUser=(JSONObject) bodyJsonObject.get("enduser");
                 String xm=endUser.getString("xm");
-                logger.info("xm:"+xm);
                 String sfz=(String)endUser.getString("sfzh");
                 String jgdm=(String)endUser.getString("jgdm");
                 if(null!=xm&&!"".equals(xm)){

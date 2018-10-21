@@ -8,14 +8,15 @@ import java.util.regex.Pattern;
 
 
 public class StringUtil {
-    public String clearBlankWrapTabs(String oldString){
+    public String clearBlankWrapTabsLowCase(String oldString){
         String newString="";
         if(!"".equals(oldString) && null!=oldString){
             Pattern pattern=Pattern.compile("\\s*|\t|\n|\r");
             Matcher matcher=pattern.matcher(oldString);
             newString=matcher.replaceAll("");
         }
-        return newString;
+
+        return newString.toLowerCase();
     }
 
     public String getSubString(String dataString,String regex,int groupIndex){

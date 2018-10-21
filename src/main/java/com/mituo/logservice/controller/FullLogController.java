@@ -1,5 +1,7 @@
 package com.mituo.logservice.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.mituo.logservice.dao.CmptFullLogDao;
 
 import com.mituo.logservice.dao.InterLogDAO;
@@ -57,7 +59,8 @@ public class FullLogController {
         Pattern conditionPattern=Pattern.compile(conditionRegex);
         StringUtil stringUtil=new StringUtil();
         if(null!=cmptFullLog.getRequestParams() && !"".equals(cmptFullLog.getRequestParams())){
-            String requestParamsData=stringUtil.clearBlankWrapTabs(cmptFullLog.getRequestParams());
+            String requestParamsData=stringUtil.clearBlankWrapTabsLowCase(cmptFullLog.getRequestParams());
+            logger.info("requestParamData"+requestParamsData);
             try{
                 username=stringUtil.getSubString(requestParamsData,usernameRegex,1);
                 sfzh=stringUtil.getSubString(requestParamsData,sfzhRegex,1);
@@ -71,7 +74,8 @@ public class FullLogController {
                 logger.error(e.getMessage());
             }
         }else if(null!=cmptFullLog.getRequestPostParams() && !"".equals(cmptFullLog.getRequestPostParams())){
-            String requestPostParamsData=stringUtil.clearBlankWrapTabs(cmptFullLog.getRequestPostParams());
+            String requestPostParamsData=stringUtil.clearBlankWrapTabsLowCase(cmptFullLog.getRequestPostParams());
+            logger.info("requestPostParamsData"+requestPostParamsData);
             try{
                 username=stringUtil.getSubString(requestPostParamsData,usernameRegex,1);
                 sfzh=stringUtil.getSubString(requestPostParamsData,sfzhRegex,1);
@@ -85,17 +89,35 @@ public class FullLogController {
                 logger.error(e.getMessage());
             }
         }else if(null!=cmptFullLog.getRequestBody() && !"".equals(cmptFullLog.getRequestBody())){
-            String requestBodyData=stringUtil.clearBlankWrapTabs(cmptFullLog.getRequestBody());
+            String requestBodyData=stringUtil.clearBlankWrapTabsLowCase(cmptFullLog.getRequestBody());
+            logger.info("requestBodyData"+requestBodyData);
             try{
-                username=stringUtil.getSubString(requestBodyData,usernameRegex,1);
-                sfzh=stringUtil.getSubString(requestBodyData,sfzhRegex,1);
-                if(!"".equals(cmptFullLog.getApiName()) && null!=cmptFullLog.getApiName()){
-                    interfaceCondition="接口名称:"+cmptFullLog.getApiName()+" 查询内容:"+stringUtil.getSubString(requestBodyData,conditionRegex,1);
-                }else{
-                    interfaceCondition="接口名称:无 "+" 查询内容:"+stringUtil.getSubString(requestBodyData,conditionRegex,1);
+                JSONObject bodyJsonObject= JSON.parseObject(requestBodyData);
+                JSONObject endUser=(JSONObject) bodyJsonObject.get("enduser");
+                String xm=endUser.getString("xm");
+                logger.info("xm:"+xm);
+                String sfz=(String)endUser.getString("sfzh");
+                String jgdm=(String)endUser.getString("jgdm");
+                if(null!=xm&&!"".equals(xm)){
+                    username=xm;
                 }
-                requester="单位:"+stringUtil.getSubString(requestBodyData,jgdmRegex,1);
+
+                if(null!=sfz&&!"".equals(sfz)){
+                    sfzh=sfz;
+                }
+                if(null!=jgdm&&!"".equals(jgdm)){
+                    requester="单位:"+jgdm;
+                }
+
+                String condition=bodyJsonObject.getString("condition");
+                if(null!=condition&&!"".equals(condition)){
+                    interfaceCondition="接口名称:"+cmptFullLog.getApiName()+" 查询内容:"+condition;
+                }else{
+                    interfaceCondition="接口名称:无 查询内容:无";
+                }
+
             }catch(Exception e){
+                logger.error("requestbody json格式解析错误");
                 logger.error(e.getMessage());
             }
         }else {
@@ -131,6 +153,12 @@ public class FullLogController {
     public String saveLog2File(){
         saveLogService.testSaveLog();
         return "保存日志成功";
+    }
+
+    @GetMapping("/savelogbytime/{startTime}/{endTime}")
+    public String saveLogByTime(@PathVariable("startTime") String startTime,@PathVariable("endTime") String endTime){
+        saveLogService.saveLogFileByTime(startTime,endTime);
+        return "按时间保存日志成功";
     }
 
 

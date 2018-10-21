@@ -105,4 +105,19 @@ public class SaveLogService {
             e.printStackTrace();
         }
     }
+
+    public void saveLogFileByTime(String startTime,String endTime){
+        Flux<InterLog> fluxLogs=interLogDAO.findByInterFaceTimeBetween(startTime,endTime);
+        SavePathUtil savePathUtil=new SavePathUtil();
+        try{
+            List<InterLog> listlogs=fluxLogs.buffer().blockLast();
+            String jsonlog=JSONObject.toJSONString(listlogs);
+            FileWriter writer=new FileWriter(savePathUtil.getSavePath(testRootPath));
+            writer.write(jsonlog);
+            writer.flush();
+            writer.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 }

@@ -65,28 +65,7 @@ public class SaveLogService {
 
 
 
-    public void testSaveLog(){
-        SavePathUtil savePathUtil=new SavePathUtil();
-        Calendar startTime=Calendar.getInstance();
-        //startTime.add(Calendar.DAY_OF_MONTH,-1);
-        startTime.set(Calendar.HOUR_OF_DAY,0);
-        startTime.set(Calendar.MINUTE,0);
-        startTime.set(Calendar.SECOND,0);
-        startTime.set(Calendar.MILLISECOND,0);
-        Date startDate=startTime.getTime();
 
-        Calendar endTime=Calendar.getInstance();
-       // endTime.add(Calendar.DAY_OF_MONTH,-1);
-        endTime.set(Calendar.HOUR_OF_DAY,23);
-        endTime.set(Calendar.MINUTE,59);
-        endTime.set(Calendar.SECOND,59);
-        endTime.set(Calendar.MILLISECOND,999);
-        Date endDate=endTime.getTime();
-        DateFormat dateFormat=new SimpleDateFormat("yyyyMMddHHmmss");
-        Flux<InterLog> fullLogFlux=interLogDAO.findByInterFaceTimeBetween(dateFormat.format(startDate),
-                dateFormat.format(endDate));
-        saveFile(JSON.toJSONString(fullLogFlux),testRootPath);
-    }
 
     public void saveLogFileByTime(String startTime,String endTime){
         DateFormat dateFormat=new SimpleDateFormat("yyyyMMddHHmmss");

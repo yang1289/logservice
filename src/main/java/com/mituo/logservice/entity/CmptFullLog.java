@@ -11,7 +11,6 @@ public class CmptFullLog {
 
     @Id
     private String idCmptFullLog;
-
     private String idApi;
     private String idApiGroup;
     private String appID;

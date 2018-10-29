@@ -7,5 +7,5 @@ spring:
       port: 27017
       database: logservice
 log:
-  rootPath: /home/sykki/logs
-  testRootPath: /home/sykki/testLogs
+  rootPath: D:/logs
+  testRootPath: D:/testLogs

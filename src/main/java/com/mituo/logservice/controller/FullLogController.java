@@ -54,6 +54,13 @@ public class FullLogController {
         return "按时间保存日志成功";
     }
 
+    @RequestMapping("/saveFullLog/{day}")
+    public String saveFullLogByDay(@PathVariable("day") String day){
+        //saveLogService.saveLogFileByDay(day);
+        saveLogService.saveLogFile();
+        return "保存日志成功";
+    }
+
 
 
 }

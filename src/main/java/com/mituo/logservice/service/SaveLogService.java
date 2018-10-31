@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 public class SaveLogService {
     @Autowired
     private CmptFullLogDao cmptFullLogDao;
+
     @Autowired
     private InterLogDAO interLogDAO;
 
@@ -44,28 +45,40 @@ public class SaveLogService {
     private String rootPath;
 
     public void saveLogFile(){
+        DateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:sss");
         DateUtil dateUtil=new DateUtil();
-        Date startDate=dateUtil.getDateFromCalendar(-1,0,0,0,0);
-        Date endDate=dateUtil.getDateFromCalendar(-1,23,59,59,999);
+        dateUtil.setDate(-1);
+        Date startDate=dateUtil.getDateFromCalendar(0,0,0,0);
+        Date endDate=dateUtil.getDateFromCalendar(23,59,59,999);
+        logger.info("startDate:"+format.format(startDate));
+        logger.info("endDate:"+format.format(endDate));
+
         Flux<CmptFullLog> fullLogFlux=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
         SavePathUtil savePathUtil=new SavePathUtil();
         List<CmptFullLog> fullLogs= fullLogFlux.buffer().blockLast();
-        List<InterLog> interLogs=getInterLogs(fullLogs);
-        try {
-            String jsonbody=JSONObject.toJSONString(interLogs);
-            FileWriter writer=new FileWriter(savePathUtil.getSavePath(rootPath));
-            writer.write(jsonbody);
-            writer.flush();
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(null!=fullLogs){
+            List<InterLog> interLogs=getInterLogs(fullLogs);
+            try {
+                String jsonbody=JSONObject.toJSONString(interLogs);
+                FileWriter writer=new FileWriter(savePathUtil.getSavePath(rootPath,endDate));
+                writer.write(jsonbody);
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
-
-
-
+    public void saveLogFileByDay(String day) {
+        DateUtil dateUtil=new DateUtil();
+        Date startDate=dateUtil.getDateFromDate(day,0,0,0,0);
+        Date endDate=dateUtil.getDateFromDate(day,23,59,59,999);
+        Flux<CmptFullLog> fullLogFlux=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
+        List<InterLog> interLogs=getInterLogs(fullLogFlux.buffer().blockLast());
+        saveFile(JSON.toJSONString(interLogs),testRootPath,endDate);
+    }
 
     public void saveLogFileByTime(String startTime,String endTime){
         DateFormat dateFormat=new SimpleDateFormat("yyyyMMddHHmmss");
@@ -79,14 +92,14 @@ public class SaveLogService {
         }
         Flux<CmptFullLog> fullLogFlux=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
         List<InterLog> interLogs=getInterLogs(fullLogFlux.buffer().blockLast());
-        saveFile(JSON.toJSONString(interLogs),testRootPath);
+        saveFile(JSON.toJSONString(interLogs),testRootPath,endDate);
 
     }
 
-    private void saveFile(String savedata,String savepath){
+    private void saveFile(String savedata,String savepath,Date date){
         SavePathUtil savePathUtil=new SavePathUtil();
         try {
-            FileWriter writer=new FileWriter(savePathUtil.getSavePath(savepath));
+            FileWriter writer=new FileWriter(savePathUtil.getSavePath(savepath,date));
             writer.write(savedata);
             writer.flush();
             writer.close();

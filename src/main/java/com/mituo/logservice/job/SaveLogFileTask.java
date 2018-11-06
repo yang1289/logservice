@@ -18,7 +18,8 @@ public class SaveLogFileTask {
     @Scheduled(cron = "0 0 0 * * *")
 //    @Scheduled(fixedRate = 10000)
     public void savetask(){
-        saveLogService.saveLogFile();
+        String result=saveLogService.saveLogFile();
         logger.info("执行定时任务");
+        logger.info(result);
     }
 }

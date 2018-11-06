@@ -1,53 +1,84 @@
 package com.mituo.logservice.entity;
 
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import javax.persistence.*;
 import java.util.Date;
 
-@Document(collection = "api_full_log")
+@Entity
+@Table(name = "ag_full_log")
 public class CmptFullLog {
-
     @Id
-    private String idCmptFullLog;
+    @Column(name = "idcmptfulllog",nullable = false,unique = true,length = 128)
+    private String idcmptfulllog;
+
+    @Column(name = "idapi",nullable = false)
     private String idApi;
+    @Column(name = "idapigroup",nullable = false)
     private String idApiGroup;
+    @Column(name = "appid")
     private String appID;
+    @Column(name="requesttime")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date requestTime;
+    @Column(name = "requestcontenttype")
     private String requestContentType;
+    @Column(name = "requestcharset")
     private String requestCharset;
+    @Column(name = "requestpath")
     private String requestPath;
+    @Column(name = "requestparams")
     private String requestParams;
+    @Column(name = "requestpostparams")
     private String requestPostParams;
+    @Column(name = "requesthost")
     private String requestHost;
+    @Column(name = "requestbody")
     private String requestBody;
+    @Column(name = "requestbodysize")
     private int requestBodySize;
+    @Column(name = "requestmethod")
     private String requestMethod;
+    @Column(name = "requestclientip")
     private String requestClientIp;
+    @Column(name = "requestport")
     private int requestPort;
+    @Column(name = "requestheaders")
     private String requestHeaders;
+    @Column(name = "apiname")
     private String apiName;
+    @Column(name = "appname")
     private String appName;
+    @Column(name = "apigroupname")
     private String apiGroupName;
+    @Column(name = "appdescription")
     private String appDescription;
+    @Column(name = "appcreatetime")
     private Date appCreateTime;
+    @Column(name = "responsetime")
     private Date responseTime;
+    @Column(name = "responsestatecode")
     private int responseStateCode;
+    @Column(name = "responseerrortype")
     private String responseErrorType;
+    @Column(name = "responsecharset")
     private String responseCharset;
+    @Column(name = "responseerrorinfo")
     private String responseErrorInfo;
+    @Column(name = "responsebody")
     private String responseBody;
+    @Column(name = "responsebodysize")
     private int responseBodySize;
+    @Column(name = "responsemediatype")
     private String responseMediaType;
+    @Column(name = "responseheaders")
     private String responseHeaders;
 
-    public String getIdCmptFullLog() {
-        return idCmptFullLog;
+    public String getIdcmptfulllog() {
+        return idcmptfulllog;
     }
 
-    public void setIdCmptFullLog(String idCmptFullLog) {
-        this.idCmptFullLog = idCmptFullLog;
+    public void setIdcmptfulllog(String idcmptfulllog) {
+        this.idcmptfulllog = idcmptfulllog;
     }
 
     public String getIdApi() {
@@ -299,11 +330,11 @@ public class CmptFullLog {
             return false;
         }
         final CmptFullLog that = (CmptFullLog)o;
-        return this.idCmptFullLog.equals(that.idCmptFullLog);
+        return this.idcmptfulllog.equals(that.idcmptfulllog);
     }
 
     @Override
     public int hashCode() {
-        return this.idCmptFullLog.hashCode();
+        return this.idcmptfulllog.hashCode();
     }
 }

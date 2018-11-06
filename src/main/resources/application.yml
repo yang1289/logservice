@@ -1,11 +1,11 @@
 server:
   port: 9092
 spring:
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: logservice
+  datasource:
+    url: jdbc:mysql://192.168.167.10:13306/ag_monitor_int?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+    username: root
+    password: admin888
+    driver-class-name: com.mysql.jdbc.Driver
 log:
   rootPath: D:/logs
   testRootPath: D:/testLogs

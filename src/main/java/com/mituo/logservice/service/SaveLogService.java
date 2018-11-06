@@ -4,38 +4,32 @@ package com.mituo.logservice.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.mituo.logservice.dao.CmptFullLogDao;
-import com.mituo.logservice.dao.InterLogDAO;
 import com.mituo.logservice.entity.CmptFullLog;
-import com.mituo.logservice.entity.InterLog;
+import com.mituo.logservice.dto.InterLogDTO;
 import com.mituo.logservice.util.DateUtil;
 import com.mituo.logservice.util.SavePathUtil;
 import com.mituo.logservice.util.StringUtil;
-import javafx.scene.input.DataFormat;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
 
 import java.io.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
 public class SaveLogService {
     @Autowired
     private CmptFullLogDao cmptFullLogDao;
-
-    @Autowired
-    private InterLogDAO interLogDAO;
 
     private static Logger logger= LogManager.getLogger(SaveLogService.class);
     @Value("${log.testRootPath}")
@@ -44,7 +38,7 @@ public class SaveLogService {
     @Value("${log.rootPath}")
     private String rootPath;
 
-    public void saveLogFile(){
+    public String saveLogFile(){
         DateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:sss");
         DateUtil dateUtil=new DateUtil();
         dateUtil.setDate(-1);
@@ -53,11 +47,11 @@ public class SaveLogService {
         logger.info("startDate:"+format.format(startDate));
         logger.info("endDate:"+format.format(endDate));
 
-        Flux<CmptFullLog> fullLogFlux=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
+        List<CmptFullLog> fullLogList=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
+        logger.info("fullloglist:"+fullLogList.size());
         SavePathUtil savePathUtil=new SavePathUtil();
-        List<CmptFullLog> fullLogs= fullLogFlux.buffer().blockLast();
-        if(null!=fullLogs){
-            List<InterLog> interLogs=getInterLogs(fullLogs);
+        if(null!=fullLogList){
+            List<InterLogDTO> interLogs=getInterLogs(fullLogList);
             try {
                 String jsonbody=JSONObject.toJSONString(interLogs);
                 FileWriter writer=new FileWriter(savePathUtil.getSavePath(rootPath,endDate));
@@ -67,20 +61,24 @@ public class SaveLogService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return "保存文件成功";
+        }else{
+            return "保存文件失败";
         }
 
     }
 
-    public void saveLogFileByDay(String day) {
+    public String saveLogFileByDay(String day) {
         DateUtil dateUtil=new DateUtil();
         Date startDate=dateUtil.getDateFromDate(day,0,0,0,0);
         Date endDate=dateUtil.getDateFromDate(day,23,59,59,999);
-        Flux<CmptFullLog> fullLogFlux=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
-        List<InterLog> interLogs=getInterLogs(fullLogFlux.buffer().blockLast());
-        saveFile(JSON.toJSONString(interLogs),testRootPath,endDate);
+        List<CmptFullLog> fullLogList=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
+        List<InterLogDTO> interLogs=getInterLogs(fullLogList);
+        return saveFile(interLogs,testRootPath,endDate);
+
     }
 
-    public void saveLogFileByTime(String startTime,String endTime){
+    public String saveLogFileByTime(String startTime,String endTime){
         DateFormat dateFormat=new SimpleDateFormat("yyyyMMddHHmmss");
         Date startDate=null;
         Date endDate=null;
@@ -90,27 +88,51 @@ public class SaveLogService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Flux<CmptFullLog> fullLogFlux=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
-        List<InterLog> interLogs=getInterLogs(fullLogFlux.buffer().blockLast());
-        saveFile(JSON.toJSONString(interLogs),testRootPath,endDate);
 
+        List<CmptFullLog> fullLogList=cmptFullLogDao.findByRequestTimeBetween(startDate,endDate);
+        List<InterLogDTO> interLogs=getInterLogs(fullLogList);
+        return saveFile(interLogs,testRootPath,endDate);
     }
 
-    private void saveFile(String savedata,String savepath,Date date){
-        SavePathUtil savePathUtil=new SavePathUtil();
-        try {
-            FileWriter writer=new FileWriter(savePathUtil.getSavePath(savepath,date));
-            writer.write(savedata);
-            writer.flush();
-            writer.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    public CmptFullLog findone(String id){
+        Optional<CmptFullLog> optionalCmptFullLog=cmptFullLogDao.findById(id);
+        if(optionalCmptFullLog.isPresent()){
+            return optionalCmptFullLog.get();
+        }else{
+            return null;
         }
     }
+    public CmptFullLog findByDate(long timestamp){
+        Date queryDate=new Date(timestamp);
+        CmptFullLog  cmptFullLog=cmptFullLogDao.findByRequestTime(queryDate);
+        return cmptFullLog;
+    }
 
-    private List<InterLog> getInterLogs(List<CmptFullLog> cmptFullLogs){
-        List<InterLog> interLogs=new ArrayList<>();
+    private String saveFile(List<InterLogDTO> savedata,String savepath,Date date){
+        if(null!=savedata){
+            SavePathUtil savePathUtil=new SavePathUtil();
+            FileWriter writer= null;
+            String result="保存文件成功";
+            try {
+                writer = new FileWriter(savePathUtil.getSavePath(savepath,date));
+                writer.write(JSON.toJSONString(savedata));
+                writer.flush();
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                result="保存文件失败";
+            }
+            return result;
+        }else{
+            return "保存文件失败";
+        }
+
+
+
+    }
+
+    private List<InterLogDTO> getInterLogs(List<CmptFullLog> cmptFullLogs){
+        List<InterLogDTO> interLogs=new ArrayList<>();
         for(CmptFullLog cmptFullLog:cmptFullLogs){
 
             DateFormat dateFormat=new SimpleDateFormat("yyyyMMddHHmmss");
@@ -200,7 +222,7 @@ public class SaveLogService {
 
 
 
-            InterLog interLog=new InterLog(requestTime,requester,cmptFullLog.getRequestClientIp(),
+            InterLogDTO interLog=new InterLogDTO(requestTime,requester,cmptFullLog.getRequestClientIp(),
                     interfaceCondition,isOk,username,sfzh,"","");
             interLogs.add(interLog);
         }
